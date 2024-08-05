@@ -51,15 +51,39 @@ async function getPlayerName() {
 async function startGame(gameName) {
   console.log('Welcome to TIC TAC TOE');
 
-  const playerOneName = await getPlayerName();
-  const playerOne = createPlayer(playerOneName);
+  // const playerOneName = await getPlayerName();
+  // const playerOne = createPlayer(playerOneName);
 
-  const playerTwoName = await getPlayerName();
-  const playerTwo = createPlayer(playerTwoName);
+  // const playerTwoName = await getPlayerName();
+  // const playerTwo = createPlayer(playerTwoName);
   rl.close();
 
-  console.log(`The name from startGame is ${gameName}`)
-  console.log(playerOne, playerTwo)
+  // console.log(`The name from startGame is ${gameName}`)
+  // console.log(playerOne, playerTwo)
+
+  console.log(displayController.boardDisplay)
 };
+
+const displayController = (function () {
+  //use gameboard to display
+  const boardState = gameboard.board;
+  let boardDisplay = '';
+
+  boardState.forEach((cell, index) => {
+    if (cell === 'O') {
+      boardDisplay += "_O_";
+    } else if (cell === 'X') {
+      boardDisplay += "_X_";
+    } else {
+      boardDisplay += "___";
+    };
+    if ((index + 1) % 3 === 0) {
+      boardDisplay += "\n";
+    } else if ((index + 1) % 1 === 0 || (index + 1) % 2 === 0) {
+      boardDisplay += "|";
+    }
+  });
+  return { boardDisplay }
+})();
 
 startGame('tictactoe');
