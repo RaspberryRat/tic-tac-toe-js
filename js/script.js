@@ -4,9 +4,19 @@
 
 
 const gameboard = (function () {
-  const board = [null, null, null, null, null, null, null, null, null]
+  let board = [null, null, null, null, null, null, null, null, null]
 
-  return { board }
+  function updateBoard(location, marker) {
+    min_location = 0;
+    max_location = 8;
+
+    if (location >= min_location && location <= max_location) {
+      board[location] = marker;
+    } else {
+      console.error('An error occured:', error);
+    }
+  }
+  return { board, updateBoard };
 
 })();
 
@@ -61,13 +71,25 @@ async function startGame(gameName) {
   // console.log(`The name from startGame is ${gameName}`)
   // console.log(playerOne, playerTwo)
 
-  console.log(displayController.boardDisplay)
+  console.log(displayController());
+  gameboard.updateBoard(0, 'X');
+  console.log(displayController());
+  gameboard.updateBoard(0, 'X');
+  console.log(displayController());
+
+  gameboard.updateBoard(8, 'O');
+  console.log(displayController());
+
+  gameboard.updateBoard(5, 'X');
+  console.log(displayController());
+
+
 };
 
-const displayController = (function () {
+function displayController() {
   //use gameboard to display
   const boardState = gameboard.board;
-  let boardDisplay = '';
+  let boardDisplay = '\n';
 
   boardState.forEach((cell, index) => {
     if (cell === 'O') {
@@ -79,11 +101,11 @@ const displayController = (function () {
     };
     if ((index + 1) % 3 === 0) {
       boardDisplay += "\n";
-    } else if ((index + 1) % 1 === 0 || (index + 1) % 2 === 0) {
+    } else if ((index + 1) % 3 !== 0) {
       boardDisplay += "|";
     }
   });
-  return { boardDisplay }
-})();
+  return boardDisplay;
+};
 
 startGame('tictactoe');
