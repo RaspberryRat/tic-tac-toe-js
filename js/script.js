@@ -69,10 +69,11 @@ async function startGame(gameName) {
 
 
   let turn = 1;
+  let currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
 
-  while (!winner()) {
+  while (!winner(currentPlayer.marker, gameboard.board)) {
     showBoard(displayController());
-    let currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
+    currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
     let move = await getPlayerMove(currentPlayer);
     gameboard.updateBoard(move - 1, currentPlayer.marker);
 
@@ -80,7 +81,8 @@ async function startGame(gameName) {
   }
   rl.close();
 
-
+  showBoard(displayController());
+  console.log(`${currentPlayer.name} is the WINNER!`);
 };
 
 function displayController() {
@@ -149,7 +151,26 @@ function validateMove(board, location) {
   };
 }
 
-function winner() {
+function winner(marker, board) {
+  const win_condtions = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+    [0, 4, 8], [2, 4, 6] // diagonals
+  ];
+
+  // create a loop that goes through game board and checks each location, if marker is at each location in a set of winners, winner declared
+  let marker_locations = []
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === marker) {
+      marker_locations.push(i);
+    };
+  };
+
+  for (let i = 0; i < win_condtions.length; i++) {
+    if (win_condtions[i].every(cell => marker_locations.includes(cell))) {
+      return true;
+    };
+  };
   return false;
 };
 
