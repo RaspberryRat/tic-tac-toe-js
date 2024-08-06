@@ -67,13 +67,15 @@ async function startGame(gameName) {
   const playerTwoName = await getPlayerName();
   const playerTwo = createPlayer(playerTwoName);
 
-  showBoard(displayController());
+
   let turn = 1;
 
   while (!winner()) {
+    showBoard(displayController());
     let currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
     let move = await getPlayerMove(currentPlayer);
-    console.log(move);
+    gameboard.updateBoard(move - 1, currentPlayer.marker);
+
     turn++;
   }
   rl.close();
@@ -112,15 +114,21 @@ async function getPlayerMove(currentPlayer) {
   const message = "What is your move? Enter the number of your chosen cell\n#";
   let move = await getUserInput(message);
 
-  while (!checkInput(move)) {
+  while (!validateInput(move)) {
     console.log(`\n${move} is an incorrect move, you must enter a number from 1-9\n`);
-
+    showBoard(displayController());
     move = await getUserInput(message);
   };
 
+  while (!validateMove(gameboard.board, move - 1)) {
+    console.log(`\n${move} is not a valid move, a piece is already at that locatin. Choose a different location.\n`)
+    showBoard(displayController());
+    move = await getUserInput(message);
+  };
+  return move;
 };
 
-function checkInput(playerInput) {
+function validateInput(playerInput) {
   const min_num = 1;
   const max_num = 9;
 
@@ -131,9 +139,18 @@ function checkInput(playerInput) {
   } else {
     return false
   };
+};
+
+function validateMove(board, location) {
+  if (board[location] === null) {
+    return true;
+  } else {
+    return false;
+  };
 }
+
 function winner() {
   return false;
-}
+};
 
 startGame('tic tac toe');
