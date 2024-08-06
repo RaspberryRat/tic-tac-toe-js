@@ -39,7 +39,7 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-function getUserInput(question) {
+async function getUserInput(question) {
   return new Promise((resolve) => {
     rl.question(question, (name) => {
       resolve(name);
@@ -59,29 +59,24 @@ async function getPlayerName() {
 };
 
 async function startGame(gameName) {
-  console.log('Welcome to TIC TAC TOE');
+  console.log(`Welcome to ${gameName.toUpperCase()}`);
 
-  // const playerOneName = await getPlayerName();
-  // const playerOne = createPlayer(playerOneName);
+  const playerOneName = await getPlayerName();
+  const playerOne = createPlayer(playerOneName);
 
-  // const playerTwoName = await getPlayerName();
-  // const playerTwo = createPlayer(playerTwoName);
+  const playerTwoName = await getPlayerName();
+  const playerTwo = createPlayer(playerTwoName);
+
+  showBoard(displayController());
+  let turn = 1;
+
+  while (!winner()) {
+    let currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
+    let move = await getPlayerMove(currentPlayer);
+    console.log(move);
+    turn++;
+  }
   rl.close();
-
-  // console.log(`The name from startGame is ${gameName}`)
-  // console.log(playerOne, playerTwo)
-
-  console.log(displayController());
-  gameboard.updateBoard(0, 'X');
-  console.log(displayController());
-  gameboard.updateBoard(0, 'X');
-  console.log(displayController());
-
-  gameboard.updateBoard(8, 'O');
-  console.log(displayController());
-
-  gameboard.updateBoard(5, 'X');
-  console.log(displayController());
 
 
 };
@@ -97,7 +92,7 @@ function displayController() {
     } else if (cell === 'X') {
       boardDisplay += "_X_";
     } else {
-      boardDisplay += "___";
+      boardDisplay += `_${index + 1}_`;
     };
     if ((index + 1) % 3 === 0) {
       boardDisplay += "\n";
@@ -108,4 +103,37 @@ function displayController() {
   return boardDisplay;
 };
 
-startGame('tictactoe');
+function showBoard(board) {
+  console.log(board);
+};
+
+async function getPlayerMove(currentPlayer) {
+  console.log(`\n${currentPlayer.name} it is your turn.\n`);
+  const message = "What is your move? Enter the number of your chosen cell\n#";
+  let move = await getUserInput(message);
+
+  while (!checkInput(move)) {
+    console.log(`\n${move} is an incorrect move, you must enter a number from 1-9\n`);
+
+    move = await getUserInput(message);
+  };
+
+};
+
+function checkInput(playerInput) {
+  const min_num = 1;
+  const max_num = 9;
+
+  if (!typeof playerInput === 'number') {
+    return false
+  } else if (playerInput >= min_num && playerInput <= max_num) {
+    return true
+  } else {
+    return false
+  };
+}
+function winner() {
+  return false;
+}
+
+startGame('tic tac toe');
