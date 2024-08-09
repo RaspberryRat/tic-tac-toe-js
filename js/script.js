@@ -22,14 +22,14 @@ const gameboard = (function () {
 
 let playerCount = 0
 
-function createPlayer(name) {
+function createPlayer(name, ai = false) {
   if (playerCount === 0) {
     var marker = 'X'
   } else {
     var marker = 'O'
   };
   playerCount++
-  return { name, marker };
+  return { name, marker, ai };
 };
 
 const readline = require('node:readline');
@@ -47,8 +47,12 @@ async function getUserInput(question) {
   });
 };
 
-async function getPlayerName() {
-  const message = `What is the ${playerCount < 1 ? 'first' : 'second'} player's name?:\n#`
+async function getPlayerName(ai = false) {
+  if (ai) {
+    return 'computer'
+  };
+
+  const message = `What is the ${playerCount < 1 ? 'first' : 'second'} player's name?:\n#`;
 
   try {
     const name = await getUserInput(message);
@@ -58,23 +62,38 @@ async function getPlayerName() {
   };
 };
 
-async function startGame(gameName) {
+async function startGame(gameName, numPlayers = 2) {
   console.log(`Welcome to ${gameName.toUpperCase()}`);
 
   const playerOneName = await getPlayerName();
   const playerOne = createPlayer(playerOneName);
 
-  const playerTwoName = await getPlayerName();
-  const playerTwo = createPlayer(playerTwoName);
+  let playerTwo;
 
+  if (numPlayers === 2) {
+    // checks if there are two human players
+    const playerTwoName = await getPlayerName();
+    playerTwo = createPlayer(playerTwoName);
+  } else {
+    // if there is only a single human player, creates an AI player
+    const playerTwoName = await getPlayerName(true);
+    playerTwo = createPlayer(playerTwoName, true);
+  }
 
   let turn = 1;
   let currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
 
   while (!winner(currentPlayer.marker, gameboard.board)) {
     showBoard(displayController());
+
     currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
-    let move = await getPlayerMove(currentPlayer);
+    let move;
+
+    if (currentPlayer.ai) {
+      move = getComputerMove(gameboard.board);
+    } else {
+      move = await getPlayerMove(currentPlayer);
+    }
     gameboard.updateBoard(move - 1, currentPlayer.marker);
 
     turn++;
@@ -149,7 +168,20 @@ function validateMove(board, location) {
   } else {
     return false;
   };
+};
+
+function getComputerMove(board) {
+  const availMoves = board.reduce((acc, val, index) => {
+    if (val === null) acc.push(index);
+    return acc
+  }, []);
+
+  const randomMove = availMoves[Math.floor(Math.random() * availMoves.length)];
+
+  // 1 is added to adjust array to cell move
+  return randomMove + 1;
 }
+
 
 function winner(marker, board) {
   const win_condtions = [
@@ -174,4 +206,8 @@ function winner(marker, board) {
   return false;
 };
 
-startGame('tic tac toe');
+// startGame('tic tac toe');
+
+// start with AI
+startGame('tic tac toe', 1)
+
