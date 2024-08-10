@@ -5,6 +5,8 @@ const playerOneInput = document.getElementById('player1-input');
 const playerTwoInput = document.getElementById('player2-input');
 const playerInputs = document.querySelectorAll('.player-input');
 const errorMsg = document.getElementById('error-msg');
+let playerOneName;
+let playerTwoName;
 
 
 
@@ -20,7 +22,8 @@ playerInputs.forEach(box => {
   box.addEventListener('focus', () => {
     errorMsg.classList.add('hidden');
   })
-})
+});
+
 function showNameInput(event) {
   const btn = event.target;
 
@@ -66,17 +69,40 @@ function validateForm(event) {
 
   if (!validInput) {
     showError(errorMsg)
+  };
 
+  if (validInput) {
+    const form = document.querySelector('.form');
+    form.classList.add('hidden');
 
-  }
+    if (playerCount === '1') {
+      playerOneName = playerOneInputValue;
+    } else if (playerCount === '2') {
+      playerOneName = playerOneInputValue;
+      playerTwoName = playerTwoInputValue;
+    } else {
+      console.error('There was an error:', error)
+    }
+    return true;
+  };
 };
 
 function showError(msg) {
   errorMsg.innerText = msg;
   errorMsg.classList.remove('hidden')
-}
+};
 
-startBtn.addEventListener('click', validateForm, false);
+function prepareGame(event) {
+  const playerCount = document.querySelector('input[name="player-count"]:checked')?.value;
+
+  if (validateForm(event)) {
+    startGame('tic tac toe', playerCount);
+  } else {
+    console.log('There was an error:', error);
+  };
+};
+
+startBtn.addEventListener('click', prepareGame, false);
 
 function selectCell(event) {
   const button = event.target;
@@ -129,25 +155,25 @@ function createPlayer(name, ai = false) {
 //   });
 // };
 
-async function getPlayerName(ai = false) {
-  if (ai) {
-    return 'computer'
-  };
+// async function getPlayerName(ai = false) {
+//   if (ai) {
+//     return 'computer'
+//   };
 
-  const message = `What is the ${playerCount < 1 ? 'first' : 'second'} player's name?:\n#`;
+//   const message = `What is the ${playerCount < 1 ? 'first' : 'second'} player's name?:\n#`;
 
-  try {
-    const name = await getUserInput(message);
-    return name;
-  } catch (error) {
-    console.error('An error occurred:', error)
-  };
-};
+//   try {
+//     const name = await getUserInput(message);
+//     return name;
+//   } catch (error) {
+//     console.error('An error occurred:', error)
+//   };
+// };
 
 // async
 function startGame(gameName, numPlayers = 2) {
   console.log(`Welcome to ${gameName.toUpperCase()}`);
-
+  // TODO next to add player input, can start game
 
   //const playerOneName = await getPlayerName();
   const playerOneName = getPlayerName();
