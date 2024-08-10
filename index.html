@@ -6,23 +6,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic Tac Toe</title>
   <link rel="stylesheet" href="./css/styles.css">
+  <script src="./js/script.js" defer></script>
 </head>
 
 <body>
 
   <h1>Tic Tac Toe</h1>
 
+  <div class="form">
+    <div class="radio">
+      <label for="playerCount">1 Player</label>
+      <input type="radio" name="player-count" value="1" class="player-count"
+        required>
+      <label for="playerCount">2 Players</label>
+      <input type="radio" name="player-count" value="2" class="player-count"
+        required>
+    </div>
 
+    <div id="player1-input" class="hidden">
+      <label for="player1-name">Player 1's name:</label>
+      <input type="text" name="player1-name" id="player1-name"
+        class="player-input">
+    </div>
+    <div id="player2-input" class="hidden">
+      <label for="player2-name">Player2's name:</label>
+      <input type="text" name="player2-name" id="player2-name"
+        class="player-input">
+    </div>
+
+    <input type="submit" value='Start Game' id='.start-btn'>
+  </div>
+
+  <div id="error-msg" class="hidden error-msg"></div>
   <section class="gameboard">
-    <div class="row1 column1 cell"></div>
-    <div class="row1 column2 cell"></div>
-    <div class="row1 column3 cell"></div>
-    <div class="row2 column1 cell"></div>
-    <div class="row2 column2 cell"></div>
-    <div class="row2 column3 cell"></div>
-    <div class="row3 column1 cell"></div>
-    <div class="row3 column2 cell"></div>
-    <div class="row3 column3 cell"></div>
+    <div class="row1 column1 cell"><button type="button"></button></div>
+    <div class="row1 column2 cell"><button type="button"></button></div>
+    <div class="row1 column3 cell"><button type="button"></button></div>
+    <div class="row2 column1 cell"><button type="button"></button></div>
+    <div class="row2 column2 cell"><button type="button"></button></div>
+    <div class="row2 column3 cell"><button type="button"></button></div>
+    <div class="row3 column1 cell"><button type="button"></button></div>
+    <div class="row3 column2 cell"><button type="button"></button></div>
+    <div class="row3 column3 cell"><button type="button"></button></div>
   </section>
 
 </body>

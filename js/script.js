@@ -1,7 +1,89 @@
+const cells = document.querySelectorAll('.cell');
+const startBtn = document.getElementById('.start-btn');
+const playerCountBtns = document.querySelectorAll('.player-count');
+const playerOneInput = document.getElementById('player1-input');
+const playerTwoInput = document.getElementById('player2-input');
+const playerInputs = document.querySelectorAll('.player-input');
+const errorMsg = document.getElementById('error-msg');
 
 
-// gameboard will be an array
 
+cells.forEach(cell => {
+  cell.addEventListener('click', selectCell)
+});
+
+playerCountBtns.forEach(btn => {
+  btn.addEventListener('click', showNameInput);
+});
+
+playerInputs.forEach(box => {
+  box.addEventListener('focus', () => {
+    errorMsg.classList.add('hidden');
+  })
+})
+function showNameInput(event) {
+  const btn = event.target;
+
+  if (btn.value === '1') {
+    playerOneInput.classList.remove('hidden');
+    playerTwoInput.classList.add('hidden');
+
+  } else if (btn.value === '2') {
+    playerOneInput.classList.remove('hidden');
+    playerTwoInput.classList.remove('hidden');
+  }
+};
+
+function validateForm(event) {
+  const playerCount = document.querySelector('input[name="player-count"]:checked')?.value;
+  const playerOneInputValue = document.getElementById('player1-name').value.trim();
+  const playerTwoInputValue = document.getElementById('player2-name').value.trim();
+
+  console.log(playerOneInputValue);
+  console.log(playerTwoInputValue);
+
+
+  let validInput = false;
+  let errorMsg = '';
+
+  if (playerCount === '1' && !playerOneInputValue) {
+    validInput = false;
+    errorMsg = "You must enter a name for Player 1."
+  } else if (playerCount === '2' && !playerOneInputValue && !playerTwoInputValue) {
+    validInput = false;
+    errorMsg = 'You must enter a name for Player 1 and Player 2'
+  } else if (playerCount === '2' && !playerOneInputValue) {
+    validInput = false;
+    errorMsg = 'You must enter a name for Player 1'
+  } else if (playerCount === '2' && !playerTwoInputValue) {
+    validInput = false;
+    errorMsg = 'You must enter a name for Player 2'
+  } else {
+    validInput = true;
+  }
+
+  event.preventDefault();
+
+  if (!validInput) {
+    showError(errorMsg)
+
+
+  }
+};
+
+function showError(msg) {
+  errorMsg.innerText = msg;
+  errorMsg.classList.remove('hidden')
+}
+
+startBtn.addEventListener('click', validateForm, false);
+
+function selectCell(event) {
+  const button = event.target;
+  const cell = button.closest('.cell');
+
+  cell.innerText = 'X';
+};
 
 const gameboard = (function () {
   let board = [null, null, null, null, null, null, null, null, null]
@@ -32,20 +114,20 @@ function createPlayer(name, ai = false) {
   return { name, marker, ai };
 };
 
-const readline = require('node:readline');
+// const readline = require('node:readline');
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+// const rl = readline.createInterface({
+//   input: process.stdin,
+//   output: process.stdout,
+// });
 
-async function getUserInput(question) {
-  return new Promise((resolve) => {
-    rl.question(question, (name) => {
-      resolve(name);
-    });
-  });
-};
+// async function getUserInput(question) {
+//   return new Promise((resolve) => {
+//     rl.question(question, (name) => {
+//       resolve(name);
+//     });
+//   });
+// };
 
 async function getPlayerName(ai = false) {
   if (ai) {
@@ -62,21 +144,27 @@ async function getPlayerName(ai = false) {
   };
 };
 
-async function startGame(gameName, numPlayers = 2) {
+// async
+function startGame(gameName, numPlayers = 2) {
   console.log(`Welcome to ${gameName.toUpperCase()}`);
 
-  const playerOneName = await getPlayerName();
+
+  //const playerOneName = await getPlayerName();
+  const playerOneName = getPlayerName();
   const playerOne = createPlayer(playerOneName);
 
   let playerTwo;
 
   if (numPlayers === 2) {
     // checks if there are two human players
-    const playerTwoName = await getPlayerName();
+    //const playerTwoName = await getPlayerName();
+    const playerTwoName = getPlayerName();
     playerTwo = createPlayer(playerTwoName);
   } else {
     // if there is only a single human player, creates an AI player
-    const playerTwoName = await getPlayerName(true);
+
+    // const playerTwoName = await getPlayerName(true);
+    const playerTwoName = getPlayerName(true);
     playerTwo = createPlayer(playerTwoName, true);
   }
 
@@ -92,7 +180,8 @@ async function startGame(gameName, numPlayers = 2) {
     if (currentPlayer.ai) {
       move = getComputerMove(gameboard.board);
     } else {
-      move = await getPlayerMove(currentPlayer);
+      //move = await getPlayerMove(currentPlayer);
+      move = getPlayerMove(currentPlayer);
     }
     gameboard.updateBoard(move - 1, currentPlayer.marker);
 
@@ -130,21 +219,26 @@ function showBoard(board) {
   console.log(board);
 };
 
-async function getPlayerMove(currentPlayer) {
+//async
+function getPlayerMove(currentPlayer) {
   console.log(`\n${currentPlayer.name} it is your turn.\n`);
   const message = "What is your move? Enter the number of your chosen cell\n#";
-  let move = await getUserInput(message);
+  // let move = await getUserInput(message);
+  let move = getUserInput(message);
 
   while (!validateInput(move)) {
     console.log(`\n${move} is an incorrect move, you must enter a number from 1-9\n`);
     showBoard(displayController());
-    move = await getUserInput(message);
+
+    //move = await getUserInput(message);
+    move = getUserInput(message);
   };
 
   while (!validateMove(gameboard.board, move - 1)) {
     console.log(`\n${move} is not a valid move, a piece is already at that locatin. Choose a different location.\n`)
     showBoard(displayController());
-    move = await getUserInput(message);
+    // move = await getUserInput(message);
+    move = getUserInput(message);
   };
   return move;
 };
@@ -209,5 +303,5 @@ function winner(marker, board) {
 // startGame('tic tac toe');
 
 // start with AI
-startGame('tic tac toe', 1)
+// startGame('tic tac toe', 1)
 

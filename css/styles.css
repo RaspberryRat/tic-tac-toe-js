@@ -13,7 +13,7 @@ h1 {}
   display: grid;
   grid-template-columns: repeat(3, 200px);
   grid-template-rows: repeat(3, 200px);
-
+  background-color: white;
 }
 
 .column2 {
@@ -32,4 +32,36 @@ h1 {}
 .column3.row3,
 .column2.row3 {
   border-top: 1px solid black;
+}
+
+.gameboard>div>button {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  border: none;
+}
+
+.gameboard>div>button:hover {
+  background-color: rgb(235, 235, 235);
+
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.error-msg {
+  background-color: rgb(237, 217, 217);
+  color: rgb(156, 63, 63);
+  width: fit-content;
+  padding: 3px 8px;
+  margin: 10px;
+  border-radius: 10px;
+  border: 1px solid rgb(175, 67, 67);
 }
