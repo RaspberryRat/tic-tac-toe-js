@@ -1,18 +1,15 @@
-const cells = document.querySelectorAll('.cell');
 const startBtn = document.getElementById('.start-btn');
 const playerCountBtns = document.querySelectorAll('.player-count');
 const playerOneInput = document.getElementById('player1-input');
 const playerTwoInput = document.getElementById('player2-input');
 const playerInputs = document.querySelectorAll('.player-input');
 const errorMsg = document.getElementById('error-msg');
+const xImg = document.createElement('img');
+xImg.src = './images/x.png';
+const oImg = document.createElement('img');
+oImg.src = './images/o.png';
 let playerOneName;
 let playerTwoName;
-
-
-
-cells.forEach(cell => {
-  cell.addEventListener('click', selectCell)
-});
 
 playerCountBtns.forEach(btn => {
   btn.addEventListener('click', showNameInput);
@@ -104,12 +101,7 @@ function prepareGame(event) {
 
 startBtn.addEventListener('click', prepareGame, false);
 
-function selectCell(event) {
-  const button = event.target;
-  const cell = button.closest('.cell');
 
-  cell.innerText = 'X';
-};
 
 const gameboard = (function () {
   let board = [null, null, null, null, null, null, null, null, null]
@@ -169,14 +161,11 @@ function createPlayer(name, ai = false) {
 //     console.error('An error occurred:', error)
 //   };
 // };
-
-// async
-function startGame(gameName, numPlayers = 2) {
+async function startGame(gameName, numPlayers = 2) {
   console.log(`Welcome to ${gameName.toUpperCase()}`);
-  // TODO next to add player input, can start game
 
   //const playerOneName = await getPlayerName();
-  const playerOneName = getPlayerName();
+  // const playerOneName = getPlayerName();
   const playerOne = createPlayer(playerOneName);
 
   let playerTwo;
@@ -184,30 +173,34 @@ function startGame(gameName, numPlayers = 2) {
   if (numPlayers === 2) {
     // checks if there are two human players
     //const playerTwoName = await getPlayerName();
-    const playerTwoName = getPlayerName();
+    // const playerTwoName = getPlayerName();
     playerTwo = createPlayer(playerTwoName);
   } else {
     // if there is only a single human player, creates an AI player
 
     // const playerTwoName = await getPlayerName(true);
-    const playerTwoName = getPlayerName(true);
-    playerTwo = createPlayer(playerTwoName, true);
+    // const playerTwoName = getPlayerName(true);
+    playerTwo = createPlayer('computer', true);
   }
 
   let turn = 1;
   let currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
 
   while (!winner(currentPlayer.marker, gameboard.board)) {
-    showBoard(displayController());
+    // showBoard(displayController());
+    let annouceMsg = document.getElementById('annoucement-msg');
 
     currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
+    annouceMsg.innerText = `It is ${currentPlayer.name}'s turn.`;
+
     let move;
 
     if (currentPlayer.ai) {
       move = getComputerMove(gameboard.board);
     } else {
       //move = await getPlayerMove(currentPlayer);
-      move = getPlayerMove(currentPlayer);
+      move = await getPlayerMove(currentPlayer);
+
     }
     gameboard.updateBoard(move - 1, currentPlayer.marker);
 
@@ -246,27 +239,55 @@ function showBoard(board) {
 };
 
 //async
-function getPlayerMove(currentPlayer) {
-  console.log(`\n${currentPlayer.name} it is your turn.\n`);
-  const message = "What is your move? Enter the number of your chosen cell\n#";
-  // let move = await getUserInput(message);
-  let move = getUserInput(message);
+// function getPlayerMove(currentPlayer) {
+//   console.log(`\n${currentPlayer.name} it is your turn.\n`);
+//   const message = "What is your move? Enter the number of your chosen cell\n#";
+//   // let move = await getUserInput(message);
+//   let move = getUserInput(message);
 
-  while (!validateInput(move)) {
-    console.log(`\n${move} is an incorrect move, you must enter a number from 1-9\n`);
-    showBoard(displayController());
+//   while (!validateInput(move)) {
+//     console.log(`\n${move} is an incorrect move, you must enter a number from 1-9\n`);
+//     showBoard(displayController());
 
-    //move = await getUserInput(message);
-    move = getUserInput(message);
-  };
+//     //move = await getUserInput(message);
+//     move = getUserInput(message);
+//   };
 
-  while (!validateMove(gameboard.board, move - 1)) {
-    console.log(`\n${move} is not a valid move, a piece is already at that locatin. Choose a different location.\n`)
-    showBoard(displayController());
-    // move = await getUserInput(message);
-    move = getUserInput(message);
-  };
-  return move;
+//   while (!validateMove(gameboard.board, move - 1)) {
+//     console.log(`\n${move} is not a valid move, a piece is already at that locatin. Choose a different location.\n`)
+//     showBoard(displayController());
+//     // move = await getUserInput(message);
+//     move = getUserInput(message);
+//   };
+//   return move;
+// };
+
+async function getPlayerMove(currentPlayer) {
+  const move = await getPlayerChoice();
+  const boardLocation = moveToArray(move);
+  if (validateMove(gameboard.board, boardLocation)) {
+    console.log('valid move');
+  } else {
+    console.log('invalid move')
+  }
+
+};
+
+function getPlayerChoice() {
+  return new Promise((resolve) => {
+    const cells = document.querySelectorAll('.cell');
+    function selectCell(event) {
+      const button = event.target;
+      const cell = button.closest('.cell');
+
+      const cell_location = Array.from(cell.classList);
+      cells.forEach(cell => cell.removeEventListener('click', selectCell));
+      resolve(cell_location)
+    };
+    cells.forEach(cell => {
+      cell.addEventListener('click', selectCell);
+    });
+  });
 };
 
 function validateInput(playerInput) {
@@ -288,6 +309,38 @@ function validateMove(board, location) {
   } else {
     return false;
   };
+};
+
+function moveToArray(array) {
+
+  console.log(array);
+  array = array.filter(className => className !== 'cell');
+  console.log(array);
+  // TODO WOULD LIKE TO FIX THIS TO BE CLEANER
+
+
+  if (array.every(i => ['row1', 'column1'].includes(i))) {
+    console.log(true)
+    return 0;
+  } else if (array.every(i => ['row1', 'column2'].includes(i))) {
+    return 1;
+  } else if (array.every(i => ['row1', 'column3'].includes(i))) {
+    return 2;
+  } else if (array.every(i => ['row2', 'column1'].includes(i))) {
+    return 3;
+  } else if (array.every(i => ['row2', 'column2'].includes(i))) {
+    return 4;
+  } else if (array.every(i => ['row2', 'column3'].includes(i))) {
+    return 5;
+  } else if (array.every(i => ['row3', 'column1'].includes(i))) {
+    return 6;
+  } else if (array.every(i => ['row3', 'column2'].includes(i))) {
+    return 7;
+  } else if (array.every(i => ['row3', 'column3'].includes(i))) {
+    return 8;
+  } else {
+    console.error('There was an error in move to array', error);
+  }
 };
 
 function getComputerMove(board) {
