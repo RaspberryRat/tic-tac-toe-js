@@ -4,10 +4,6 @@ const playerOneInput = document.getElementById('player1-input');
 const playerTwoInput = document.getElementById('player2-input');
 const playerInputs = document.querySelectorAll('.player-input');
 const errorMsg = document.getElementById('error-msg');
-const xImg = document.createElement('img');
-xImg.src = './images/x.png';
-const oImg = document.createElement('img');
-oImg.src = './images/o.png';
 let playerOneName;
 let playerTwoName;
 
@@ -333,18 +329,27 @@ function displayDOM(cellClasses, playerMarker) {
   const classes = '.' + cellClasses.join('.');
   const div = document.querySelector(`div${classes}`);
   const marker = getMarker(playerMarker);
-  div.innerText = marker;
+  div.appendChild(marker);
 };
+
+const xImg = document.createElement('img');
+const oImg = document.createElement('img');
+oImg.src = './images/o.png';
 
 function getMarker(marker) {
   if (marker === 'X') {
-    return 'X';
+    const xImg = document.createElement('img');
+    xImg.src = './images/x.png';
+    return xImg;
   } else if (marker === 'O') {
-    return 'O';
+    const oImg = document.createElement('img');
+    oImg.src = './images/o.png';
+    return oImg;
   } else {
     console.log('An error occured');
   }
-}
+};
+
 function getComputerMove(board) {
   const availMoves = board.reduce((acc, val, index) => {
     if (val === null) acc.push(index);

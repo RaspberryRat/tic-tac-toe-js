@@ -65,3 +65,16 @@ h1 {}
   border-radius: 10px;
   border: 1px solid rgb(175, 67, 67);
 }
+
+.gameboard>div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gameboard>div>img {
+  position: relative;
+  width: 190px;
+  height: auto;
+  left: -5px;
+}
