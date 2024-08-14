@@ -89,6 +89,7 @@ function prepareGame(event) {
   const playerCount = document.querySelector('input[name="player-count"]:checked')?.value;
 
   if (validateForm(event)) {
+    console.log('Starting...')
     startGame('tic tac toe', playerCount);
   } else {
     console.error('There was an error:', error);
@@ -103,10 +104,10 @@ const gameboard = (function () {
   let board = [null, null, null, null, null, null, null, null, null]
 
   function updateBoard(location, marker) {
-    min_location = 0;
-    max_location = 8;
+    const minLocation = 0;
+    const maxLocation = 8;
 
-    if (location >= min_location && location <= max_location) {
+    if (location >= minLocation && location <= maxLocation) {
       board[location] = marker;
     } else {
       console.log('An error occured:');
@@ -160,30 +161,21 @@ function createPlayer(name, ai = false) {
 async function startGame(gameName, numPlayers = 2) {
   console.log(`Welcome to ${gameName.toUpperCase()}`);
 
-  //const playerOneName = await getPlayerName();
-  // const playerOneName = getPlayerName();
   const playerOne = createPlayer(playerOneName);
 
   let playerTwo;
 
   if (numPlayers === 2) {
-    // checks if there are two human players
-    //const playerTwoName = await getPlayerName();
-    // const playerTwoName = getPlayerName();
     playerTwo = createPlayer(playerTwoName);
   } else {
-    // if there is only a single human player, creates an AI player
-
-    // const playerTwoName = await getPlayerName(true);
-    // const playerTwoName = getPlayerName(true);
     playerTwo = createPlayer('computer', true);
-  }
+  };
 
   let turn = 1;
   let currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
 
-  while (!winner(currentPlayer.marker, gameboard.board)) {
-    // showBoard(displayController());
+  while (!winner(currentPlayer, gameboard.board)) {
+    showBoard(displayController());
     let annouceMsg = document.getElementById('annoucement-msg');
 
     currentPlayer = turn % 2 === 0 ? playerTwo : playerOne;
@@ -201,7 +193,6 @@ async function startGame(gameName, numPlayers = 2) {
     gameboard.updateBoard(move, currentPlayer.marker);
     turn++;
   }
-  rl.close();
 
   showBoard(displayController());
   console.log(`${currentPlayer.name} is the WINNER!`);
@@ -340,8 +331,6 @@ function moveToArray(array) {
 
 function displayDOM(cellClasses, playerMarker) {
   const classes = '.' + cellClasses.join('.');
-  console.log(classes);
-
   const div = document.querySelector(`div${classes}`);
   const marker = getMarker(playerMarker);
   div.innerText = marker;
@@ -363,14 +352,39 @@ function getComputerMove(board) {
   }, []);
 
   const randomMove = availMoves[Math.floor(Math.random() * availMoves.length)];
+  const cellClasses = moveToDOM(randomMove);
+  displayDOM(cellClasses, 'O');
+  return randomMove;
+};
 
-  // 1 is added to adjust array to cell move
-  return randomMove + 1;
+function moveToDOM(arrayLocation) {
+
+  switch (arrayLocation) {
+    case 0:
+      return ['row1', 'column1', 'cell'];
+    case 1:
+      return ['row1', 'column2', 'cell'];
+    case 2:
+      return ['row1', 'column3', 'cell'];
+    case 3:
+      return ['row2', 'column1', 'cell'];
+    case 4:
+      return ['row2', 'column2', 'cell'];
+    case 5:
+      return ['row2', 'column3', 'cell'];
+    case 6:
+      return ['row3', 'column1', 'cell'];
+    case 7:
+      return ['row3', 'column2', 'cell'];
+    case 8:
+      return ['row3', 'column3', 'cell'];
+  }
 };
 
 
 
-function winner(marker, board) {
+function winner(currentPlayer, board) {
+  const marker = currentPlayer.marker;
   const win_condtions = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
     [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
@@ -387,11 +401,18 @@ function winner(marker, board) {
 
   for (let i = 0; i < win_condtions.length; i++) {
     if (win_condtions[i].every(cell => marker_locations.includes(cell))) {
+      annouceWinner(currentPlayer);
       return true;
     };
   };
   return false;
 };
+
+function annouceWinner(player) {
+  const winnerDiv = document.querySelector('.winner-msg');
+
+  winnerDiv.innerText = `${player.name} is the WINNER!`
+}
 
 // startGame('tic tac toe');
 
