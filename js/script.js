@@ -125,35 +125,6 @@ function createPlayer(name, ai = false) {
   return { name, marker, ai };
 };
 
-// const readline = require('node:readline');
-
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout,
-// });
-
-// async function getUserInput(question) {
-//   return new Promise((resolve) => {
-//     rl.question(question, (name) => {
-//       resolve(name);
-//     });
-//   });
-// };
-
-// async function getPlayerName(ai = false) {
-//   if (ai) {
-//     return 'computer'
-//   };
-
-//   const message = `What is the ${playerCount < 1 ? 'first' : 'second'} player's name?:\n#`;
-
-//   try {
-//     const name = await getUserInput(message);
-//     return name;
-//   } catch (error) {
-//     console.error('An error occurred:', error)
-//   };
-// };
 async function startGame(gameName, numPlayers = 2) {
   console.log(`Welcome to ${gameName.toUpperCase()}`);
 
@@ -182,7 +153,6 @@ async function startGame(gameName, numPlayers = 2) {
     if (currentPlayer.ai) {
       move = getComputerMove(gameboard.board);
     } else {
-      //move = await getPlayerMove(currentPlayer);
       move = await getPlayerMove(currentPlayer);
 
     }
@@ -220,29 +190,6 @@ function showBoard(board) {
   console.log(board);
 };
 
-//async
-// function getPlayerMove(currentPlayer) {
-//   console.log(`\n${currentPlayer.name} it is your turn.\n`);
-//   const message = "What is your move? Enter the number of your chosen cell\n#";
-//   // let move = await getUserInput(message);
-//   let move = getUserInput(message);
-
-//   while (!validateInput(move)) {
-//     console.log(`\n${move} is an incorrect move, you must enter a number from 1-9\n`);
-//     showBoard(displayController());
-
-//     //move = await getUserInput(message);
-//     move = getUserInput(message);
-//   };
-
-//   while (!validateMove(gameboard.board, move - 1)) {
-//     console.log(`\n${move} is not a valid move, a piece is already at that locatin. Choose a different location.\n`)
-//     showBoard(displayController());
-//     // move = await getUserInput(message);
-//     move = getUserInput(message);
-//   };
-//   return move;
-// };
 
 async function getPlayerMove(currentPlayer) {
   const move = await getPlayerChoice();
@@ -418,9 +365,3 @@ function annouceWinner(player) {
 
   winnerDiv.innerText = `${player.name} is the WINNER!`
 }
-
-// startGame('tic tac toe');
-
-// start with AI
-// startGame('tic tac toe', 1)
-
