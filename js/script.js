@@ -39,10 +39,6 @@ function validateForm(event) {
   const playerOneInputValue = document.getElementById('player1-name').value.trim();
   const playerTwoInputValue = document.getElementById('player2-name').value.trim();
 
-  console.log(playerOneInputValue);
-  console.log(playerTwoInputValue);
-
-
   let validInput = false;
   let errorMsg = '';
 
@@ -95,7 +91,7 @@ function prepareGame(event) {
   if (validateForm(event)) {
     startGame('tic tac toe', playerCount);
   } else {
-    console.log('There was an error:', error);
+    console.error('There was an error:', error);
   };
 };
 
@@ -113,7 +109,7 @@ const gameboard = (function () {
     if (location >= min_location && location <= max_location) {
       board[location] = marker;
     } else {
-      console.error('An error occured:', error);
+      console.log('An error occured:');
     }
   }
   return { board, updateBoard };
@@ -202,8 +198,7 @@ async function startGame(gameName, numPlayers = 2) {
       move = await getPlayerMove(currentPlayer);
 
     }
-    gameboard.updateBoard(move - 1, currentPlayer.marker);
-
+    gameboard.updateBoard(move, currentPlayer.marker);
     turn++;
   }
   rl.close();
@@ -264,12 +259,15 @@ function showBoard(board) {
 
 async function getPlayerMove(currentPlayer) {
   const move = await getPlayerChoice();
-  const boardLocation = moveToArray(move);
-  if (validateMove(gameboard.board, boardLocation)) {
-    console.log('valid move');
-  } else {
-    console.log('invalid move')
-  }
+  let boardLocation = moveToArray(move);
+
+  while (!validateMove(gameboard.board, boardLocation)) {
+    let annouceMsg = document.getElementById('annoucement-msg');
+    annouceMsg.innerText = 'That is an invalid move, please select a valid location.'
+    let boardLocation = moveToArray(move);
+  };
+  displayDOM(move, currentPlayer.marker);
+  return boardLocation;
 
 };
 
@@ -313,14 +311,11 @@ function validateMove(board, location) {
 
 function moveToArray(array) {
 
-  console.log(array);
   array = array.filter(className => className !== 'cell');
-  console.log(array);
   // TODO WOULD LIKE TO FIX THIS TO BE CLEANER
 
 
   if (array.every(i => ['row1', 'column1'].includes(i))) {
-    console.log(true)
     return 0;
   } else if (array.every(i => ['row1', 'column2'].includes(i))) {
     return 1;
@@ -343,6 +338,24 @@ function moveToArray(array) {
   }
 };
 
+function displayDOM(cellClasses, playerMarker) {
+  const classes = '.' + cellClasses.join('.');
+  console.log(classes);
+
+  const div = document.querySelector(`div${classes}`);
+  const marker = getMarker(playerMarker);
+  div.innerText = marker;
+};
+
+function getMarker(marker) {
+  if (marker === 'X') {
+    return 'X';
+  } else if (marker === 'O') {
+    return 'O';
+  } else {
+    console.log('An error occured');
+  }
+}
 function getComputerMove(board) {
   const availMoves = board.reduce((acc, val, index) => {
     if (val === null) acc.push(index);
@@ -353,7 +366,8 @@ function getComputerMove(board) {
 
   // 1 is added to adjust array to cell move
   return randomMove + 1;
-}
+};
+
 
 
 function winner(marker, board) {
