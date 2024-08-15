@@ -389,6 +389,7 @@ function annouceWinner(player) {
   const winnerDiv = document.querySelector('.winner-msg');
 
   winnerDiv.innerText = `${player.name} is the WINNER!`
+  playAgain();
 };
 
 function checkTieGame(board) {
@@ -404,6 +405,22 @@ function announceTie() {
   hideAnnoucment();
   const winnerDiv = document.querySelector('.winner-msg');
   winnerDiv.innerText = 'There are no moves available. TIE GAME'
-
-
+  playAgain();
 };
+
+
+function playAgain() {
+  toggleRestartButton();
+
+  const restartBtn = document.querySelector('.restart-btn');
+
+  restartBtn.addEventListener('click', () => {
+    toggleRestartButton();
+    location.reload();
+  })
+};
+
+function toggleRestartButton() {
+  const restartBtn = document.querySelector('.restart-btn');
+  restartBtn.classList.toggle('hidden');
+}

@@ -14,6 +14,7 @@ h1 {}
   grid-template-columns: repeat(3, 200px);
   grid-template-rows: repeat(3, 200px);
   background-color: white;
+  margin-top: 25px;
 }
 
 .column2 {
