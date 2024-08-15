@@ -82,6 +82,7 @@ function showError(msg) {
 };
 
 function prepareGame(event) {
+  showAnnouce();
   const playerCount = document.querySelector('input[name="player-count"]:checked')?.value;
 
   if (validateForm(event)) {
@@ -94,6 +95,10 @@ function prepareGame(event) {
 
 startBtn.addEventListener('click', prepareGame, false);
 
+function showAnnouce() {
+  const annouceMsg = document.getElementById('annoucement-msg');
+  annouceMsg.classList.remove('hidden');
+}
 
 
 const gameboard = (function () {
@@ -113,15 +118,15 @@ const gameboard = (function () {
 
 })();
 
-let playerCount = 0
+let totalPlayers = 0
 
 function createPlayer(name, ai = false) {
-  if (playerCount === 0) {
+  if (totalPlayers === 0) {
     var marker = 'X'
   } else {
     var marker = 'O'
   };
-  playerCount++
+  totalPlayers++
   return { name, marker, ai };
 };
 
@@ -129,11 +134,10 @@ async function startGame(gameName, numPlayers = 2) {
   console.log(`Welcome to ${gameName.toUpperCase()}`);
 
   const playerOne = createPlayer(playerOneName);
-
   let playerTwo;
 
-  if (numPlayers === 2) {
-    playerTwo = createPlayer(playerTwoName);
+  if (numPlayers === 2 || numPlayers === '2') {
+    playerTwo = createPlayer(playerTwoName, false);
   } else {
     playerTwo = createPlayer('computer', true);
   };
@@ -151,14 +155,18 @@ async function startGame(gameName, numPlayers = 2) {
     let move;
 
     if (currentPlayer.ai) {
-      move = getComputerMove(gameboard.board);
+      move = await getComputerMove(gameboard.board);
     } else {
       move = await getPlayerMove(currentPlayer);
 
     }
     gameboard.updateBoard(move, currentPlayer.marker);
     turn++;
-  }
+    if (checkTieGame(gameboard.board)) {
+      announceTie();
+      break;
+    };
+  };
 
   showBoard(displayController());
   console.log(`${currentPlayer.name} is the WINNER!`);
@@ -297,7 +305,7 @@ function getMarker(marker) {
   }
 };
 
-function getComputerMove(board) {
+async function getComputerMove(board) {
   const availMoves = board.reduce((acc, val, index) => {
     if (val === null) acc.push(index);
     return acc
@@ -305,8 +313,19 @@ function getComputerMove(board) {
 
   const randomMove = availMoves[Math.floor(Math.random() * availMoves.length)];
   const cellClasses = moveToDOM(randomMove);
+  await computerThoughts();
   displayDOM(cellClasses, 'O');
   return randomMove;
+};
+
+async function computerThoughts() {
+  const annouceMsg = document.getElementById('annoucement-msg');
+  annouceMsg.innerText = '';
+  annouceMsg.innerText = 'Computer is Thinking';
+  for (let i = 0; i < 3; i++) {
+    await new Promise(r => setTimeout(r, 500));
+    annouceMsg.innerText += '  .';
+  };
 };
 
 function moveToDOM(arrayLocation) {
@@ -353,6 +372,7 @@ function winner(currentPlayer, board) {
 
   for (let i = 0; i < win_condtions.length; i++) {
     if (win_condtions[i].every(cell => marker_locations.includes(cell))) {
+      hideAnnoucment();
       annouceWinner(currentPlayer);
       return true;
     };
@@ -360,8 +380,30 @@ function winner(currentPlayer, board) {
   return false;
 };
 
+function hideAnnoucment() {
+  const annouceMsg = document.getElementById('annoucement-msg');
+  annouceMsg.classList.add('hidden');
+};
+
 function annouceWinner(player) {
   const winnerDiv = document.querySelector('.winner-msg');
 
   winnerDiv.innerText = `${player.name} is the WINNER!`
-}
+};
+
+function checkTieGame(board) {
+  if (board.includes(null)) {
+    return false;
+  } else {
+    announceTie();
+
+  }
+};
+
+function announceTie() {
+  hideAnnoucment();
+  const winnerDiv = document.querySelector('.winner-msg');
+  winnerDiv.innerText = 'There are no moves available. TIE GAME'
+
+
+};
